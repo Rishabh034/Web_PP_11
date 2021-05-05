@@ -1,62 +1,91 @@
-let fs=require("fs");
-//const { fileURLToPath } = require("node:url");
-let extensionMapping=require("./folder.js");
-//console.log(extensionMapping);
+let fs = require("fs");
+//let filekadata = fs.readFileSync("./abc.txt", "utf-8");
+//console.log(filekadata);
 
-//let fs=require("fs");
-
-let testfolderpath="./download";
-// let test=testfolderpath+"/"+file;
-// console.log(test);
-
-let allfile=fs.readdirSync(testfolderpath);
- console.log(allfile);
-// console.log(allfile[0]);
-for(let i=0;i<allfile.length;i++)
-{
-    Sortfile(allfile[i]);
-}
-
-function getextension(file)
-{
-    file = file.split(".");
-    return file[1];
-}
-
-function checkfolderextension(file)
-{
-   let extensions=testfolderpath;
-   for(let key in extensionMapping )
-     {
-         let extension=extensionMapping[key];
-     if(extension.includes(file))
-       {
-        extensions=extensions+"/"+key;
-        break;
-      
+//let ch = filekadata.split("\r\n");
+// console.log(ch);
+function getfiledata(file) {
+    let data = "";
+    for (let i = 0; i < file.length; i++) {
+        if (!fs.existsSync(file[i])) {
+            console.log("file does not exist");
+            return;
         }
-     }
-
-     let targetfolder=fs.existsSync(extensions);
-     if(!targetfolder)
-     {
-         fs.mkdirSync(extensions);
-     }
-     return extensions;
+        if(i==file.length-1)
+        data += fs.readFileSync(file[i]);
+        else
+        data +=fs.readFileSync(file[i]) + "\r\n";
+    }
+    return data;
 }
-function move(file,extension)
-{
-    let source=testfolderpath+ "/" +file;
-    let target=extension+ "/" +file;
 
-    fs.copyFileSync(source,target);
-    fs.unlinkSync(source);
+function getSfiledata(ch1) {
+    let ch = ch1.split("\r\n");
+    let emptyincluded = false;
+    let removespace = [];
+    for (let i = 0; i < ch.length; i++) {
+        if (ch[i] == "" && emptyincluded == false) {
+            removespace.push(ch[i]);
+            emptyincluded = true;
+        }
+        else if (ch[i] != "") {
+            removespace.push(ch[i]);
+            if (i < ch.length - 2) emptyincluded = false;
+        }
+
+    }
+    //console.log(removespace);
+    //  return removespace;
+
+    let data = removespace.join("\r\n");
+    return data;
 }
-function Sortfile(file)
-{
-    let extension=getextension(file);
+function Bfiledata(ch1) {
+    let ch = ch1.split("\r\n");
+    let count = 1;
+    let removespace = [];
+    let emptyincluded = false;
 
-  let targetfolder=  checkfolderextension(extension);
-   console.log(targetfolder);
-    move(file,targetfolder);
+    for (let i = 0; i < ch.length; i++) {
+        if (ch[i] == "" && emptyincluded == false) {
+            removespace.push( ch[i]);
+            emptyincluded = true;
+            count++;
+        }
+        else if (ch[i] != "") {
+            removespace.push(count + "." + ch[i]);
+            if (i < ch.length - 2) emptyincluded = false;
+            count++;
+        }
+        // count++;
+    }
+    let data = removespace.join("\r\n");
+    return data;
+}
+function nfiledata(ch1) {
+    let ch = ch1.split("\r\n");
+    let removespace = [];
+    let count = 1;
+
+    for (let i = 0; i < ch.length; i++) {
+        if (ch[i] == "") {
+            removespace.push(count + "." + ch[i]);
+            count++;
+        }
+        else {
+            removespace.push(count + "." + ch[i]);
+            count++;
+        }
+    }
+    let data = removespace.join("\r\n");
+    return data;
+}
+
+module.exports =
+{
+    getfiledata: getfiledata,
+    getSfiledata: getSfiledata,
+    Bfiledata: Bfiledata,
+    nfiledata: nfiledata
+
 }
